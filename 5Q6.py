@@ -37,7 +37,7 @@ def filter_quiz_data(df, selected_years, selected_categories):
 
 def generate_certificate_image(details):
     # Set the Japanese font
-    matplotlib.rcParams['font.family'] = 'MS Gothic'
+    matplotlib.rcParams['font.family'] = 'MS Gothic'  # Change to a Japanese font available in your environment
     
     fig, ax = plt.subplots(figsize=(8, 6))  # Adjust size as needed
     ax.axis('off')
@@ -52,7 +52,8 @@ def generate_certificate_image(details):
     )
     
     # Add text to the plot
-    ax.text(0.5, 0.5, certificate_text, fontsize=14, ha='center', va='center', bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=1'))
+    ax.text(0.5, 0.5, certificate_text, fontsize=14, ha='center', va='center', 
+            bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=1'))
 
     # Save the image to a BytesIO buffer
     buf = BytesIO()
