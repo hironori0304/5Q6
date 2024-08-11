@@ -35,22 +35,28 @@ def filter_quiz_data(df, selected_years, selected_categories):
         })
     return quiz_data
 
-def save_table_as_image(df):
+def generate_certificate_image(details):
     # Set the Japanese font
     matplotlib.rcParams['font.family'] = 'MS Gothic'
     
-    fig, ax = plt.subplots(figsize=(10, 2 + len(df) * 0.5))  # Adjust size based on the number of rows
+    fig, ax = plt.subplots(figsize=(8, 6))  # Adjust size as needed
     ax.axis('off')
     
-    # Convert DataFrame to a table in the figure
-    table = ax.table(cellText=df.values, colLabels=df.columns, cellLoc='center', loc='center', colColours=['#f5f5f5'] * len(df.columns))
-    table.auto_set_font_size(False)
-    table.set_fontsize(10)  # Match font size with other elements
-    table.scale(1.2, 1.2)  # Adjust the scaling if needed
+    # Define certificate content
+    certificate_text = (
+        f"完了した問題\n\n"
+        f"日付: {details['日付']}\n\n"
+        f"過去問: {details['過去問']}\n\n"
+        f"分野: {details['分野']}\n\n"
+        f"問題数: {details['問題数']}\n"
+    )
     
+    # Add text to the plot
+    ax.text(0.5, 0.5, certificate_text, fontsize=14, ha='center', va='center', bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=1'))
+
     # Save the image to a BytesIO buffer
     buf = BytesIO()
-    plt.savefig(buf, format='png', bbox_inches='tight', pad_inches=0.1)
+    plt.savefig(buf, format='png', bbox_inches='tight', pad_inches=0.5)
     buf.seek(0)
     plt.close(fig)
     return buf
@@ -152,16 +158,19 @@ def main():
                         }
                         st.session_state.completed_problems.append(completed_problem)
 
-                        st.markdown("<h3 style='font-size: 16px;'>完了した問題</h3>", unsafe_allow_html=True)
-                        df_completed = pd.DataFrame(st.session_state.completed_problems)
-                        st.write(df_completed)
+                        # Display completed problem details as text
+                        st.markdown(f"**完了した問題**")
+                        st.write(f"日付: {completed_problem['日付']}")
+                        st.write(f"過去問: {completed_problem['過去問']}")
+                        st.write(f"分野: {completed_problem['分野']}")
+                        st.write(f"問題数: {completed_problem['問題数']}")
 
-                        # Convert the table to an image
-                        image_buffer = save_table_as_image(df_completed)
+                        # Generate and download the certificate image
+                        image_buffer = generate_certificate_image(completed_problem)
                         st.download_button(
                             label="証明書をダウンロード",
                             data=image_buffer,
-                            file_name="completed_problems.png",
+                            file_name="certificate.png",
                             mime="image/png"
                         )
 
